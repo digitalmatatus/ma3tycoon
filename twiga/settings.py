@@ -96,6 +96,13 @@ DATABASES = {
         'USER': 'twiga',
         'PASSWORD': 'twiga',
         'HOST': '127.0.0.1'
+    },
+    'gtfs': {
+        'ENGINE': 'django.contrib.gis.db.backends.postgis',
+        'NAME': 'gtfs',
+        'USER': 'gtfs',
+        'PASSWORD': 'gtfs',
+        'HOST': '127.0.0.1'
     }
 }
 
@@ -139,9 +146,18 @@ USE_TZ = True
 STATIC_URL = '/static/'
 
 
+# Media files
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+
 # Rest framework
 
 REST_FRAMEWORK = {
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.IsAuthenticated',
+    ),
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_jwt.authentication.JSONWebTokenAuthentication',
     )
