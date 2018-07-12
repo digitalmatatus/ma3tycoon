@@ -21,19 +21,19 @@ from rest_framework_jwt.views import verify_jwt_token
 from app.views import raise_404
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
+    path('ma3tycoon/admin/', admin.site.urls),
 
     # Custom URL's
-    path('auth/', include('djoser.urls')),
+    path('ma3tycoon/auth/', include('djoser.urls')),
 
     # disable the old endpoint (Order is important)
-    path('auth/jwt/refresh/', raise_404),
+    path('ma3tycoon/auth/jwt/refresh/', raise_404),
 
     # Register the new URL under an ambigous name
-    path('auth/beam/m33/up/', verify_jwt_token),
+    path('ma3tycoon/auth/beam/m33/up/', verify_jwt_token),
 
-    path('auth/', include('djoser.urls.jwt')),
-    path('stops/', include('stops.urls')),
-    path('routes/', include('routes.urls')),
-    path('questions/', include('questions.urls')),
+    path('ma3tycoon/auth/', include('djoser.urls.jwt')),
+    path('ma3tycoon/stops/', include('stops.urls')),
+    path('ma3tycoon/routes/', include('routes.urls')),
+    path('ma3tycoon/questions/', include('questions.urls')),
 ]
