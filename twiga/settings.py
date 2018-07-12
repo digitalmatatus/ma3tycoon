@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.gis',
 
     # Third party apps
     'rest_framework',
@@ -172,4 +173,4 @@ CORS_ORIGIN_ALLOW_ALL = True
 # djangorestframework-jwt settings
 
 JWT_ALLOW_REFRESH = True
-JWT_EXPIRATION_DELTA = timedelta(minutes=30)
+JWT_EXPIRATION_DELTA = timedelta(days=1)
