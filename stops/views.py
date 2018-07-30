@@ -7,12 +7,19 @@ from rest_framework.response import Response
 
 
 class StopsView(APIView):
-    def get(self, request):
-        cursor = connections['gtfs'].cursor()
-        cursor.execute("SELECT stop_id, name FROM stop")
-        columns = [column[0] for column in cursor.description]
-        stops = []
-        for row in cursor.fetchall():
-            stops.append(dict(zip(columns, row)))
+    def __init__(self):
+        self.cursor = connections['gtfs'].cursor()
 
-        return Response({"success": True, "result": stops})
+    def get(self, request):
+        try:
+            return Response({"success": True, "result": self.get_stops()})
+        except Exception as e:
+            return Response({"success": False, "result": list(e)})
+
+    def get_stops(self):
+        self.cursor.execute("SELECT stop_id, name, ST_AsText(point) AS position FROM stop")
+        columns = [column[0] for column in self.cursor.description]
+        stops = []
+        for row in self.cursor.fetchall():
+            stops.append(dict(zip(columns, row)))
+        return stops

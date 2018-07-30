@@ -1,5 +1,6 @@
 env/*
 venv/*
+media/*
 *.pyc
 *.sqlite3
 *.sqlite

@@ -8,6 +8,8 @@ from rest_framework.response import Response
 
 from .models import Question, Choice, TriviaFeedback, TransitFeedback
 
+POINTS_PER_TRANSIT_FEEDBACK = 10
+
 
 class TriviaQuestionsView(APIView):
     def get(self, request):
@@ -23,27 +25,49 @@ class TriviaQuestionsView(APIView):
 
             return Response({"success": True, "result": questions})
         except Exception as e:
-            return Response({"success": False, "result": e})
+            return Response({"success": False, "result": str(e)})
 
     def post(self, request):
         try:
             json_data = json.loads(request.body)
+            points_gained = 0
             for data in json_data['data']:
+                choice_obj = Choice.objects.get(id=data['choice'])
                 TriviaFeedback.objects.create(question=Question.objects.get(id=data['question']),
-                                              choice=Choice.objects.get(id=data['choice']), user=request.user)
-            return Response({"success": True})
+                                              choice=choice_obj, user=request.user)
+                points_gained += choice_obj.points
+
+            return Response({"success": True, "points_gained": points_gained})
         except Exception as e:
-            return Response({"success": False, "result": e})
+            return Response({"success": False, "result": str(e)})
 
 
 class TransitQuestionsView(APIView):
     def post(self, request):
         try:
             json_data = json.loads(request.body)
+            points_gained = 0
             for data in json_data['data']:
                 TransitFeedback.objects.create(stop=data['stop'], point=Point(data['longitude'], data['latitude']),
                                                position_correct=data['position_correct'], user=request.user)
+                points_gained += POINTS_PER_TRANSIT_FEEDBACK
+
+            return Response({"success": True, "points_gained": points_gained})
+        except Exception as e:
+            return Response({"success": False, "result": str(e)})
+
+
+class LeaderBoardView(APIView):
+    def get(self, request):
+        try:
+            trivia_leaderboard = TriviaFeedback.objects.all() \
+                .values('username') \
+                .annotate(score=Sum('points')) \
+                .order_by('-score')
+
+            # do join with TransitFeedback
 
             return Response({"success": True})
         except Exception as e:
-            return Response({"success": False, "result": e})
+            return Response({"success": False, "result": str(e)})
+
