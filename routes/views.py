@@ -29,8 +29,12 @@ class RoutesView(APIView):
             json_data = json.loads(request.body)['data']
             route = json_data['route']
 
-            self.cursor.execute("SELECT ST_AsText(geometry) from route WHERE route_id = '{}'".format(route))
-            route_wkt = self.cursor.fetchone()[0]
+            self.cursor.execute(" SELECT ST_AsText(geometry), ST_AsText(ST_Centroid(geometry)) "
+                                " FROM route "
+                                " WHERE route_id = '{}'".format(route))
+            result = self.cursor.fetchone()
+            route_wkt = result[0]
+            route_center = result[1]
 
             self.cursor.execute(" SELECT s.stop_id, s.name, ST_AsText(s.point) AS position "
                                 " FROM route r"
@@ -44,6 +48,7 @@ class RoutesView(APIView):
                 stops.append(dict(zip(columns, row)))
 
             return Response({"success": True, "result": {
+                    "route_center": route_center,
                     "route_wkt": route_wkt,
                     "stops": stops,
                 }})
