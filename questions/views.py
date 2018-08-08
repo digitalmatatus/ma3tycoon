@@ -8,8 +8,6 @@ from rest_framework.response import Response
 
 from .models import Question, Choice, TriviaFeedback, TransitFeedback
 
-POINTS_PER_TRANSIT_FEEDBACK = 10
-
 
 class TriviaQuestionsView(APIView):
     def get(self, request):
@@ -29,7 +27,7 @@ class TriviaQuestionsView(APIView):
 
     def post(self, request):
         try:
-            json_data = json.loads(request.body)
+            json_data = json.loads(request.body.decode('utf-8'))
             points_gained = 0
             for data in json_data['data']:
                 choice_obj = Choice.objects.get(id=data['choice'])
@@ -43,14 +41,17 @@ class TriviaQuestionsView(APIView):
 
 
 class TransitQuestionsView(APIView):
+    def __init__(self):
+        self.POINTS_PER_TRANSIT_FEEDBACK = 10
+
     def post(self, request):
         try:
-            json_data = json.loads(request.body)
+            json_data = json.loads(request.body.decode('utf-8'))
             points_gained = 0
             for data in json_data['data']:
                 TransitFeedback.objects.create(stop=data['stop'], point=Point(data['longitude'], data['latitude']),
                                                position_correct=data['position_correct'], user=request.user)
-                points_gained += POINTS_PER_TRANSIT_FEEDBACK
+                points_gained += self.POINTS_PER_TRANSIT_FEEDBACK
 
             return Response({"success": True, "points_gained": points_gained})
         except Exception as e:
@@ -60,9 +61,9 @@ class TransitQuestionsView(APIView):
 class LeaderBoardView(APIView):
     def get(self, request):
         try:
-            trivia_leaderboard = TriviaFeedback.objects.all() \
-                .values('username') \
-                .annotate(score=Sum('points')) \
+            trivia_leaderboard = TriviaFeedback.objects.all()\
+                .values('username')\
+                .annotate(score=Sum('points'))\
                 .order_by('-score')
 
             # do join with TransitFeedback

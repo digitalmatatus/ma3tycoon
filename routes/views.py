@@ -26,7 +26,7 @@ class RoutesView(APIView):
 
     def post(self, request):
         try:
-            json_data = json.loads(request.body)['data']
+            json_data = json.loads(request.body.decode('utf-8'))['data']
             route = json_data['route']
 
             self.cursor.execute(" SELECT ST_AsText(geometry), ST_AsText(ST_Centroid(geometry)) "
