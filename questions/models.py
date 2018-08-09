@@ -53,6 +53,7 @@ class TransitFeedback(models.Model):
                                         choices=TRANSIT_FEEDBACK_CHOICES,
                                         help_text='Is this position accurate??')
     user = models.ForeignKey(User, on_delete=models.PROTECT)
+    date_added = models.DateTimeField(default=timezone.now, blank=True)
 
     class Meta:
         verbose_name = 'Transit feedback'
@@ -60,3 +61,14 @@ class TransitFeedback(models.Model):
 
     def __str__(self):
         return '{} {}'.format(self.stop, self.get_position_correct_display())
+
+
+class LeaderBoard(models.Model):
+    user = models.ForeignKey(User, on_delete=models.PROTECT)
+    trivia_points = models.IntegerField(default=0)
+    transit_points = models.IntegerField(default=0)
+    date_modified = models.DateTimeField(default=timezone.now, blank=True)
+
+    class Meta:
+        verbose_name = 'Leaderboard'
+        verbose_name_plural = 'Leaderboards'
