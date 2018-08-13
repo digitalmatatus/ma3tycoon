@@ -55,7 +55,7 @@ class TransitQuestionsView(APIView):
             json_data = json.loads(request.body.decode('utf-8'))
             points_gained = 0
             for data in json_data['data']:
-                TransitFeedback.objects.create(stop=data['stop'], point=Point(data['longitude'], data['latitude']),
+                TransitFeedback.objects.create(stop=data['stop'], point=Point(float(data['longitude']), float(data['latitude'])),
                                                position_correct=data['position_correct'], user=request.user)
                 points_gained += self.POINTS_PER_TRANSIT_FEEDBACK
 
