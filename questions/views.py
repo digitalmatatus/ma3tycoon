@@ -76,10 +76,11 @@ class LeaderBoardView(APIView):
         try:
             cursor = connections['default'].cursor()
             cursor.execute("SELECT "
-                           "u.username,"
+                           " u.username,"
                            " COALESCE(l.trivia_points,0) AS trivia,"
                            " COALESCE(l.transit_points,0) AS transit,"
-                           " (l.trivia_points + l.transit_points) AS total"
+                           " (l.trivia_points + l.transit_points) AS total,"
+                           " rank() over (order by (l.trivia_points + l.transit_points) desc) as rank"
                            " FROM questions_leaderboard l"
                            " JOIN auth_user AS u ON(u.id=l.user_id)"
                            " ORDER BY total DESC")
@@ -87,15 +88,13 @@ class LeaderBoardView(APIView):
             leaderboard = []
             for row in cursor.fetchall():
                 leaderboard.append(dict(zip(columns, row)))
-            cursor.execute("SELECT "
-                           " COALESCE(trivia_points,0) AS trivia,"
-                           " COALESCE(transit_points,0) AS transit,"
-                           " (trivia_points + transit_points) AS total"
-                           " FROM questions_leaderboard WHERE user_id = {}"
-                           " ORDER BY total DESC".format(request.user.id))
-            columns = [column[0] for column in cursor.description]
-            details = cursor.fetchone() or []
-            my_score = dict(zip(columns, details))
+
+            my_score = []
+            for i in leaderboard:
+                if i['username'] == request.user.username:
+                    my_score.append(i)
+
+                    break
 
             return Response({"success": True, "leaderboard": leaderboard, "my_score": my_score})
         except Exception as e:
