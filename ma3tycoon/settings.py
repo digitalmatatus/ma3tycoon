@@ -51,6 +51,7 @@ INSTALLED_APPS = [
     'stops',
     'routes',
     'questions',
+    'fares',
 ]
 
 MIDDLEWARE = [
@@ -178,4 +179,4 @@ CORS_ORIGIN_ALLOW_ALL = True
 # djangorestframework-jwt settings
 
 JWT_ALLOW_REFRESH = True
-JWT_EXPIRATION_DELTA = timedelta(days=1)
+JWT_EXPIRATION_DELTA = timedelta(days=7)

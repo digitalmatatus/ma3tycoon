@@ -36,4 +36,5 @@ urlpatterns = [
     path('ma3tycoon/stops/', include('stops.urls')),
     path('ma3tycoon/routes/', include('routes.urls')),
     path('ma3tycoon/questions/', include('questions.urls')),
+    path('ma3tycoon/fares/', include('fares.urls')),
 ]
