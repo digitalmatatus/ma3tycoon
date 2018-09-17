@@ -12,7 +12,7 @@ from .models import Fare
 
 class AddFareView(APIView):
     def post(self, request):
-        json_data = json.loads(request.body)
+        json_data = json.loads(request.body.decode('utf-8'))
 
         fare = Fare()
         fare.stop_to = json_data['stop_to']
