@@ -52,6 +52,7 @@ INSTALLED_APPS = [
     'routes',
     'questions',
     'fares',
+    'account',
 ]
 
 MIDDLEWARE = [
