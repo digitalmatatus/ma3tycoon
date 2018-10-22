@@ -1,4 +1,5 @@
 import json
+import random
 
 from django.db import connections
 from django.contrib.gis.geos import Point
@@ -9,7 +10,7 @@ from rest_framework.response import Response
 from .models import Question, Choice, TriviaFeedback, TransitFeedback, LeaderBoard
 
 
-class TriviaQuestionsView(APIView):
+class TriviaQuestions(APIView):
     def get(self, request):
         try:
             cursor = connections['default'].cursor()
@@ -46,7 +47,7 @@ class TriviaQuestionsView(APIView):
             return Response({"success": False, "result": str(e)})
 
 
-class TransitQuestionsView(APIView):
+class TransitQuestions(APIView):
     def __init__(self):
         self.POINTS_PER_TRANSIT_FEEDBACK = 10
 
@@ -71,7 +72,7 @@ class TransitQuestionsView(APIView):
             return Response({"success": False, "result": str(e)})
 
 
-class LeaderBoardView(APIView):
+class LeaderBoard(APIView):
     def get(self, request):
         try:
             cursor = connections['default'].cursor()
@@ -100,3 +101,35 @@ class LeaderBoardView(APIView):
         except Exception as e:
             return Response({"success": False, "result": str(e)})
 
+
+class Analysis(APIView):
+    def get(self, request):
+        try:
+            cursor = connections['default'].cursor()
+
+            cursor.execute("SELECT q.id, q.question_text, json_agg(json_build_object('id' , c.id, 'choice_text',"
+                           " c.choice_text)) as choices FROM questions_question q INNER JOIN questions_choice c ON "
+                           "(c.question_id = q.id) GROUP BY q.id, q.question_text")
+
+            columns = [column[0] for column in cursor.description]
+            result = []
+            for row in cursor.fetchall():
+                result.append(dict(zip(columns, row)))
+
+            cursor.execute("SELECT choice_id, COUNT(choice_id) AS frequency FROM questions_triviafeedback GROUP BY choice_id")
+            columns = [column[0] for column in cursor.description]
+            aggregates = []
+            for row in cursor.fetchall():
+                aggregates.append(dict(zip(columns, row)))
+
+            for choice_options in result:
+                choices = choice_options['choices']
+                for choice in choices:
+                    for aggregate in aggregates:
+                        if aggregate['choice_id'] == choice['id']:
+                            choice['frequency'] = aggregate['frequency']
+                            choice['color'] = "#%06x" % random.randint(0, 0xFFFFFF)
+
+            return Response({"success": True, "result": result})
+        except Exception as e:
+            return Response({"success": False, "result": str(e)})
