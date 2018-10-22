@@ -15,10 +15,12 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from django.conf import settings
+from django.conf.urls.static import static
 
 from rest_framework_jwt.views import verify_jwt_token
 
-from app.views import raise_404
+from app import views
 
 urlpatterns = [
     path('ma3tycoon/admin/', admin.site.urls),
@@ -27,7 +29,7 @@ urlpatterns = [
     path('ma3tycoon/auth/', include('djoser.urls')),
 
     # disable the old endpoint (Order is important)
-    path('ma3tycoon/auth/jwt/refresh/', raise_404),
+    path('ma3tycoon/auth/jwt/refresh/', views .raise_404),
 
     # Register the new URL under an ambigous name
     path('ma3tycoon/auth/beam/m33/up/', verify_jwt_token),
@@ -38,4 +40,6 @@ urlpatterns = [
     path('ma3tycoon/questions/', include('questions.urls')),
     path('ma3tycoon/fares/', include('fares.urls')),
     path('ma3tycoon/account/', include('account.urls')),
-]
+
+    path('ma3tycoon/', views.index),
+] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
