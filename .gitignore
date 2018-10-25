@@ -6,5 +6,4 @@ media/*
 *.sqlite
 *.db
 .idea/*
-static/*
 .vscode/*
