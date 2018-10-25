@@ -150,7 +150,7 @@ STATIC_URL = '/ma3tycoon/assets/'
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static')
 ]
-
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 # Media files
 
 MEDIA_URL = '/media/'
